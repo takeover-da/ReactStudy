@@ -12,4 +12,4 @@
 
   npx create-react-app react-app
   
-  명령어 / 생성명령어 / 프로젝트명
+  (명령어 / 생성명령어 / 프로젝트명)
