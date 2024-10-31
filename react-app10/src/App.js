@@ -1,290 +1,146 @@
-import logo from './logo.svg';
 import './App.css';
 import { useState } from 'react';
 
-function Header(props) {
 
-  // 
-  return (
-    <header>
-      <h1><a href='/' onClick={
-        (event) => {
-          event.preventDefault();
-          props.onChangeMode();
-        }
-      }>{props.title}</a></h1>
-    </header>
-  );
-}
-
-function Nav(props) {
-
-    const lis = [];
-
-    for(let t of props.topics){
-
-      // 
-      lis.push( <li key={t.id}>
-        <a href={'/read/' + t.id} id={t.id} onClick={
-          (event) => {
-            event.preventDefault();
-            props.onChangeMode(event.target.id);
-          }
-        }> 
-          {t.title}
-        </a>
-        </li> );
-
-  }
-
-  return (
-    <ol>
-      {lis}
-    </ol>
-  );
-}
-
-function Article(props) {
-  
-  return (
-    <article>
-      <h2>{props.title}</h2>
-      {props.body}
-    </article>
-  );
-}
-
-function Create(props) {
-
-  return(
-    <article>
-      <h2>Create</h2>
-
-      <form onSubmit={
-        (event)=>{
-          event.preventDefault(); 
-          const title = event.target.title.value;
-          const body = event.target.body.value;
-          props.onCreate(title, body);
-        }
-      }>
-        <p>
-        <input type='text' name='title' placeholder='title'></input>
-        </p>
-        <p>
-          <textarea name='body' placeholder='body'></textarea>
-        </p>
-        <p>
-          <input type='submit' value='Create'></input>
-        </p>
-      </form>
-    </article>
-  );
-}
-
-function Update(props) {
-
-  const [title, setTitle] = useState(props.title);
-  const [body, setBody] = useState(props.body);
-
-  return (
-    <article>
-      <h2>Update</h2>
-      <form onSubmit={event => {
-        event.preventDefault();
-        const title = event.target.title.value;
-        const body = event.target.body.value;
-        props.onUpdate(title, body);
-      }}>
-        
-        <p>
-          <input
-            type='text'
-            name='title'
-            value={title}
-            placeholder='title'
-            onChange={(event) => {
-              setTitle(event.target.value);
-            }}
-          />
-        </p>
-        <p>
-          <textarea
-            name='body'
-            value={body} 
-            placeholder='body'
-            onChange={(event) => {
-              setBody(event.target.value);
-            }}
-          ></textarea>
-        </p>
-        <p>
-          <input type='submit' value='Update' />
-        </p>
-      </form> 
-    </article>
-  );
-}
-
+// 계산기 앱 만들기
 function App() {
-  
-  let [ mode, setMode ] = useState('WELCOME'); //초기값
-  let [ id, setId ] = useState(null);
-  let [ nextid, setNextid ] = useState(4);
-  let content = null;
+  const [num1, setNum1] = useState(null);  // 입력한 첫번째 숫자
+  const [num2, setNum2] = useState(null);  // 입력한 두번째 숫자
+  const [operator, setOperator] = useState(null);  // 입력한 연산자
+  const [input, setInput] = useState('');  // 현재 식
+  const [result, setResult] = useState(null);  // 결과
 
-  let [ topics, setTopics ] = useState([
-    {id:1, title:'html', body:'html is ...'},
-    {id:2, title:'css', body:'css is ...'},
-    {id:3, title:'javascript', body:'javascript is ...'}
-  ]);
+  // 숫자를 입력하는 함수
+  const inputNumber = (value) => {
+    setInput(input + value);  // 현재 입력된 식 업데이트 (숫자와 연산자)
 
-  let contextControl = null;
-  
-  if (mode === "WELCOME"){
-    content = <Article title="Welcome" body="Hello, Web"></Article>
-  } else if(mode === "READ"){
-    let title, body = null;
-    for(let t of topics){
-      
-      if(t.id === Number(id)){ 
-        title = t.title;
-        body = t.body;
-      }
+    if (operator === null) {
+      setNum1(value);  // 첫번째 숫자 저장
+    } else {
+      setNum2(value);  // 두번째 숫자 저장
     }
-    
-    content = <Article title={title} body={body}></Article>
+  };
 
-    // 모드가 Read일 경우, 수정 링크 생성
-    contextControl = 
-      <>
-        <a className='update-a' href={'/update/' + id} onClick={
-          (event)=>{
-            event.preventDefault(); // 페이지 이동 방지
-            setMode('UPDATE'); // 수정 모드로 전환
-          }
-        }>Update</a>
-        <input className='delete-input' type='button' value='Delete'
-          onClick={()=>{
-            // topics 배열에서 선택된 topic을 삭제
-            const newTopics = [];
+  // 연산자를 입력하는 함수
+  const inputOper = (value) => {
+    setInput(input + value);
+    setOperator(value);
+  };
 
-            // 해당 요소를 제외한 나머지 요소를 배열에 옮기기
-            for(let t of topics){
-              // topic의 id가 삭제할 id가 아니라면
-              if(t.id !== Number(id)){      // 1, 2, 3 !== 1
-                newTopics.push(t);
-              }
-            }
+  // 결과 계산
+  const calculate = () => {
 
-            // 새로운 배열로 state를 업데이트
-            setTopics(newTopics);
-            // 삭제가 끝났으면 모드를 전환 (삭제->처음)
-            setMode("WELCOME");
+    let tempResult = 0;
 
-          }}
-        
-        ></input>
-      </>
-
-  } else if(mode === "CREATE") {
-      content = <Create onCreate={
-        (title, body)=>{
-          
-          // 기존 배열을 복사하여 새로운 배열로 생성
-          const newTopics = [...topics];
-          
-          let newTopic = { id: nextid, title:title, body:body }
-          
-          newTopics.push(newTopic);
-
-          // setTopics(topics); // topics state를 업데이트 
-          setTopics(newTopics); // 100번지 -> 200번지
-          setMode('READ');
-          setId(nextid);
-          setNextid(nextid + 1);
-
-        }
-      }>
-
-      </Create>
-  
-  // 모드가 UPDATE로 전환되면 수정폼을 표시
-  } else if(mode === "UPDATE") {  
-    
-    // 해당 Topic의 데이터를 Update 컴포넌트로 전달
-
-    let title, body = null;
-
-    // id가 일치하는 topic 찾기
-    for(let t of topics){
-      
-      console.log(t.id, id); // 각 요소의 id와 현재 id 비교
-
-      if(t.id === Number(id)){
-        title = t.title;
-        body = t.body;
-      }
+    switch (operator) {
+      case '+':
+        tempResult = num1 + num2;
+        break;
+      case '-':
+        tempResult = num1 - num2;
+        break;
+      case '*':
+        tempResult = num1 * num2;
+        break;
+      case '/':
+        tempResult = num1 / num2;
+        break;
+      default:
+        tempResult = 0;
     }
-    
-    // props를 통해 Update 컴포넌트에 title, body
-    // Topic을 수정하는 이벤트 기능 추가
-    content = <Update title={title} body={body}
-      onUpdate={(title, body)=>{
-        
-        // 기존 배열을 복사하여 새로운 배열을 생성
-        const newTopics = [ ...topics ];
 
-        // 전달받은 데이터로 기존 topic을 교체
-        const updateTopic = { id: Number(id), title: title, body: body}
+    setResult(tempResult);
+  };
 
-        // topics 배열에서 해당 id와 일치하는 topic을 찾아서 교체
-        for(let i in newTopics){
-          if(newTopics[i].id === Number(id)){
-
-            // id가 일치하면 요소를 교체
-            newTopics[i] = updateTopic;
-            
-          }
-        }
-        // setTopics(topics); // 100번지 -> 100번지
-        setTopics(newTopics); // 100번지 -> 200번지
-        setMode('READ'); // 모드 전환 (수정 -> 조회)
-      }}
-    ></Update>
-  }
+  // 입력 초기화
+  const clear = () => {
+    setInput('');  //식
+    setResult(null);  //결과
+    setNum1(null);  //숫자1
+    setNum2(null);  //숫자2
+    setOperator(null);  //연산자
+  };
 
   return (
     <div>
-      {/* Header를 클릭하면 모드가 WELCOME으로 변경 */}
-      <Header title="Web" onChangeMode={
-        () => {
-          setMode('WELCOME');
-        }
-      }></Header>
-      {/* Nav 클릭하면 모드가 READ로 변경 */}
-      <Nav topics={topics} onChangeMode={
-        (id) => {
-          setMode('READ');
-          setId(id);
-        }
-      }></Nav>
+      <h1>계산기</h1>
+      <div>
+        <div><span>식:</span>{input}</div>
+        <div><span>결과:</span>{result}</div>
+      </div>
 
-      {/* 동적으로 생성 */}
-      {content} 
+      <div>
+        {[1,2,3,4,5,6,7,8,9,0].map((num) => (
+          <button key={num} onClick={() => inputNumber(num)}>
+            {num}
+          </button>
+        ))}
+      </div>
+      <div>
+        {['+', '-', '*', '/'].map((op) => (
+          <button key={op} onClick={() => inputOper(op)}>
+            {op}
+          </button>
+        ))}
+      </div>
+      <button onClick={calculate}>=</button>
+      <button onClick={clear}>C</button>
 
-      {/* 등록폼으로 이동하는 링크 */}
-      <a href="/create" onClick={
-        (event)=>{
-          event.preventDefault(); // 다른 페이지로 이동하는 것을 방지
-          setMode('CREATE'); // 모드 전환
-        }
-      }>Create</a>
-
-      {contextControl}
-    
     </div>
   );
 }
 
 export default App;
+
+// function App() {
+  
+//   // state는 컴포넌트의 생명주기를 관리하므로 컴포넌트 함수에서만 생성 가능
+
+//   const [num1, setNum1] = useState(null);
+//   const [num2, setNum2] = useState(null);
+//   const [cal, setCal] = useState('');
+//   const [result, setResult] = useState(null);
+
+//   const handleNumClick = (number) => {
+//     if (!cal) {
+//       setNum1((prev) => prev + number);
+//     } else {
+//       setNum2((prev) => prev + number);
+//     }
+//   };
+
+//   const handleCalClick = (operator) => {
+//     if (num1) {
+//       setCal(operator);
+//     }
+//   };
+  
+//   return (
+//     <div>
+//       <h1>계산기</h1>
+//       <br/>
+//       <p>식: {num1} {cal} {num2}</p>
+//       <p>결과: {result}</p>
+
+//       <div>
+//         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((number) => (
+//           <button key={number} onClick={() => handleNumClick(number)}>
+//             {number}
+//           </button>
+//         ))}
+//       </div>
+
+//       <div>
+//         {['+', '-', '*', '/'].map((cal) => (
+//           <button key={cal} onClick={() => handleCalClick(cal)}>{cal}</button>
+//         ))}
+//       </div>
+
+//       <br/>
+//       <input type='button' value="="></input>
+//       <input type='button' value="C"></input>
+//     </div>
+//   );
+// }
+
+// export default App;
