@@ -1,0 +1,68 @@
+nav {
+  background-color: gray;
+  padding: 10px;
+}
+
+nav ul {
+  list-style-type: none; /* 기본 목록 스타일 제거 */
+  padding: 0; /* 기본 패딩 제거 */
+  display: flex; /* Flexbox 사용 */
+  justify-content: space-around; /* 아이템 간의 간격 조정 */
+}
+
+nav li {
+  margin: 0 10px; /* 아이템 간 여백 조정 */
+}
+
+nav a {
+  color: white; /* 링크 색상 */
+  text-decoration: none; /* 밑줄 제거 */
+  padding: 10px 15px; /* 패딩 추가 */
+}
+
+nav a:hover {
+  color: purple; /* 호버 시 배경색 변경 */
+  text-decoration: underline;
+}
+
+
+
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
