@@ -1,7 +1,8 @@
 // Left 함수
 import { useSelector } from "react-redux";
 
-// useSelector: 컴포넌트에서 스토어를 조회하는 함수
+
+// useSelector: 스토어 안에 있는 state를 가져오는 함수
 
 export const Left1 = ()=>{
 
@@ -25,12 +26,13 @@ const Left2 = ()=>{
 
 const Left3 = ()=>{
 
-  // redux 스토어의 state 중에서 num 가져오기
-  // 리턴값: state 중에서 선택
+  // useSelector
+  // redux 스토어의 state 중에서 num 꺼내기
   const num = useSelector(state=>state.num);
 
   return (
     <div>
+      {/* 꺼낸 state 출력 */}
       <h1>Left3 : {num}</h1>
     </div>
   );

@@ -1,6 +1,7 @@
 // Right 함수
 import { useDispatch } from "react-redux";
 
+
 // useDispatch: 스토어에 있는 state를 변경하는 함수
 
 export const Right1 = ()=>{
@@ -34,7 +35,7 @@ const Right3 = ()=>{
       <h1>Right3</h1>
       <input type="button" value='+' onClick={()=>{
 
-        // 디스패치로 PLUS 액션을 전달
+        // 디스패치로 'PLUS'액션을 전달
         // dispatch -> reducer
         dispatch({type:'PLUS'});
 
